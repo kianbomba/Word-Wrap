@@ -12,6 +12,8 @@ use KianBomba\WrapUtil;
 
 
 $helper = new WrapUtil();
-$things = $helper->wrap("Helloworld from kian bomba", 10);
+//$things = $helper->wrap("Helloworld from kian bomba", 10);
 
+
+$things = $helper->wrapV2("hello world\nabcde", 2);
 echo $things;

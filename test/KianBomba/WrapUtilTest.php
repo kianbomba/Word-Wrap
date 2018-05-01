@@ -52,4 +52,33 @@ class WrapUtilTest extends TestCase
         $exp = "Hello\nworld\nfrom\nkian\nbomba";
         $this->assertEquals($exp, $this->helper->wrap($x, 3));
     }
+
+    public function testWrapV2(): void
+    {
+        $x = "hello world";
+        $exp = "hello\nworld";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 5));
+    }
+
+    public function testWrapV2Case2(): void
+    {
+        $x = "hello world\nupper";
+        $exp = "he\nll\no \nwo\nrl\nd \nup\npe\nr";
+        //$exp = "he\nll\no\nwo\nrl\nd\nup\npe\nr";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 2));
+    }
+
+    public function testWrapV2Case3(): void
+    {
+        $x = "hello world\nfrom the other side";
+        $exp = "hello world\nfrom the ot\nher side";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 11));
+    }
+
+    public function testSanitize(): void
+    {
+        $x = "hello world\nfrom the other side\tabcde";
+        $exp = "hello world from the other side abcde";
+        $this->assertEquals($exp, $this->helper->sanitize($x));
+    }
 }

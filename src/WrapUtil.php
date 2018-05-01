@@ -35,6 +35,10 @@ class WrapUtil
      * - if $i is the last index of the string, then we should
      *
      * array join the list with "\n"
+     *
+     * @deprecated
+     *
+     * - deprecated due to missed the requirement
      */
     public function wrap(string $text, int $length): string
     {
@@ -102,5 +106,73 @@ class WrapUtil
         }
 
         return implode("\n", $merge);
+    }
+
+    /**
+     * @param string $text
+     * @param int $length
+     * @return string
+     *
+     * - this is the new update for the wrap method to match with the requirement
+     * - (ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)
+     *
+     */
+    public function wrapV2(string $text, int $length): string
+    {
+        if (empty($text)) return "";
+        $text = $this->sanitize($text);
+        $merge = $tmpMerge = array();
+        $threshold = strlen($text) - 1;
+        for ($i=0; $i <= $threshold; $i++)
+        {
+            $a = $text[$i];
+
+            $ln1 = strlen($a);
+            if ($ln1 == $length) //for case length of 1
+            {
+                if (!empty($tmpMerge))
+                {
+                    $merge[] = implode("", $tmpMerge);
+                    $tmpMerge = array();
+                }
+                $merge[] = $a;
+                continue;
+            }
+
+            if ($a == " " && count($tmpMerge) == 0) continue;
+            $tmpMerge[$i] = $a;
+            $t = implode("", $tmpMerge);
+            $ln2 = strlen($t);
+
+            if ($ln2 > $length)
+            {
+                unset($tmpMerge[$i]);
+                $merge[] = implode("", $tmpMerge);
+                if ($i == $threshold)
+                {
+                    $merge[] = $a;
+                }
+                else
+                {
+                    $tmpMerge = array($i => $a);
+                }
+            }
+            else if ($ln2 == $length)
+            {
+                $merge[] = $t;
+                $tmpMerge = array();
+            }
+            else if ($i ==  $threshold)
+            {
+                $merge[] = $t;
+            }
+        }
+
+        return implode("\n", $merge);
+    }
+
+    public function sanitize(string $input)
+    {
+        return preg_replace("/\s+/", " ",$input);
     }
 }
