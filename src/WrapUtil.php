@@ -35,6 +35,10 @@ class WrapUtil
      * - if $i is the last index of the string, then we should
      *
      * array join the list with "\n"
+     *
+     * @deprecated
+     *
+     * - deprecated due to missed the requirement
      */
     public function wrap(string $text, int $length): string
     {
@@ -98,6 +102,60 @@ class WrapUtil
             else if ($i == $threshold)
             {
                 $merge[] = implode(" ", $tmpMerge);
+            }
+        }
+
+        return implode("\n", $merge);
+    }
+
+    /**
+     * @param string    $text           => the input text that we are going to wrap up.
+     * @param int       $length         => the pre-defined length that we are going to wrap
+     * @param bool      $sanitizing     => determined whether we would want to sanitize the string or not
+     * @return string
+     *
+     * - this is the new update for the wrap method to match with the requirement
+     * - (ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)
+     *
+     */
+    public function wrapV2(string $text, int $length, bool $sanitizing=true): string
+    {
+        if ($sanitizing) $text = Sanitizer::instance()->spaceSanitize($text);
+        if (empty($text)) return "";
+
+        $merge = $tmpMerge = array();
+        $threshold = strlen($text) - 1;
+        for ($i=0; $i <= $threshold; $i++)
+        {
+            $a = $text[$i];
+
+            /* by this statement, if the next append is the space */
+            if (in_array($a, [" ", "\n", "\t"]) && count($tmpMerge) == 0) continue;
+            $tmpMerge[$i] = $a;
+            $t = implode("", $tmpMerge);
+            $ln2 = strlen($t);
+
+            if ($ln2 > $length)
+            {
+                unset($tmpMerge[$i]);
+                $merge[] = implode("", $tmpMerge);
+                if ($i == $threshold)
+                {
+                    $merge[] = $a;
+                }
+                else
+                {
+                    $tmpMerge = array($i => $a);
+                }
+            }
+            else if ($ln2 == $length)
+            {
+                $merge[] = $t;
+                $tmpMerge = array();
+            }
+            else if ($i ==  $threshold)
+            {
+                $merge[] = $t;
             }
         }
 
