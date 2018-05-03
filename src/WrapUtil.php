@@ -109,37 +109,28 @@ class WrapUtil
     }
 
     /**
-     * @param string $text
-     * @param int $length
+     * @param string    $text           => the input text that we are going to wrap up.
+     * @param int       $length         => the pre-defined length that we are going to wrap
+     * @param bool      $sanitizing     => determined whether we would want to sanitize the string or not
      * @return string
      *
      * - this is the new update for the wrap method to match with the requirement
      * - (ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)
      *
      */
-    public function wrapV2(string $text, int $length): string
+    public function wrapV2(string $text, int $length, bool $sanitizing=true): string
     {
+        if ($sanitizing) $text = Sanitizer::instance()->spaceSanitize($text);
         if (empty($text)) return "";
-        $text = $this->sanitize($text);
+
         $merge = $tmpMerge = array();
         $threshold = strlen($text) - 1;
         for ($i=0; $i <= $threshold; $i++)
         {
             $a = $text[$i];
 
-            $ln1 = strlen($a);
-            if ($ln1 == $length) //for case length of 1
-            {
-                if (!empty($tmpMerge))
-                {
-                    $merge[] = implode("", $tmpMerge);
-                    $tmpMerge = array();
-                }
-                $merge[] = $a;
-                continue;
-            }
-
-            if ($a == " " && count($tmpMerge) == 0) continue;
+            /* by this statement, if the next append is the space */
+            if (in_array($a, [" ", "\n", "\t"]) && count($tmpMerge) == 0) continue;
             $tmpMerge[$i] = $a;
             $t = implode("", $tmpMerge);
             $ln2 = strlen($t);
@@ -169,10 +160,5 @@ class WrapUtil
         }
 
         return implode("\n", $merge);
-    }
-
-    public function sanitize(string $input)
-    {
-        return preg_replace("/\s+/", " ",$input);
     }
 }

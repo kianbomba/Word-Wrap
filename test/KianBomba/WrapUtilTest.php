@@ -11,7 +11,10 @@ namespace KianBomba;
 
 use PHPUnit\Framework\TestCase;
 
-
+/**
+ * Class WrapUtilTest
+ * @package KianBomba
+ */
 class WrapUtilTest extends TestCase
 {
     /**
@@ -64,7 +67,6 @@ class WrapUtilTest extends TestCase
     {
         $x = "hello world\nupper";
         $exp = "he\nll\no \nwo\nrl\nd \nup\npe\nr";
-        //$exp = "he\nll\no\nwo\nrl\nd\nup\npe\nr";
         $this->assertEquals($exp, $this->helper->wrapV2($x, 2));
     }
 
@@ -75,10 +77,31 @@ class WrapUtilTest extends TestCase
         $this->assertEquals($exp, $this->helper->wrapV2($x, 11));
     }
 
-    public function testSanitize(): void
+    public function testWrapV2Case4(): void
     {
-        $x = "hello world\nfrom the other side\tabcde";
-        $exp = "hello world from the other side abcde";
-        $this->assertEquals($exp, $this->helper->sanitize($x));
+        $x = "hello\nworld";
+        $exp = "hello\nworld";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 5, false));
+    }
+
+    public function testWrapV2Case5(): void
+    {
+        $x = "hello world\nupper";
+        $exp = "he\nll\no \nwo\nrl\nd\n\nup\npe\nr";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 2, false));
+    }
+
+    public function testWrapV2Cas6(): void
+    {
+        $x = "word";
+        $exp = "wo\nrd";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 2));
+    }
+
+    public function testWrapV2Cas7(): void
+    {
+        $x = "word";
+        $exp ="w\no\nr\nd";
+        $this->assertEquals($exp, $this->helper->wrapV2($x, 1));
     }
 }
