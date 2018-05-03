@@ -117,6 +117,10 @@ class WrapUtil
      * - this is the new update for the wrap method to match with the requirement
      * - (ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)(ಥ_ಥ)
      *
+     *
+     * @deprecated
+     *
+     * - deprecated due to not coping well with the requirements
      */
     public function wrapV2(string $text, int $length, bool $sanitizing=true): string
     {
@@ -159,6 +163,102 @@ class WrapUtil
             }
         }
 
+        return implode("\n", $merge);
+    }
+
+    /**
+     * @param string $input
+     * @param int $length
+     * @return string
+     *
+     * - this is the new version that would fit better with the requirements
+     * - logic UPDATE in ENGLISH:
+     * ------------ START -----------
+     * + if the length of input is less than the length required -> just return string, no need to perform logic
+     *
+     * + when the length of the input is bigger than the required -> start performing logic
+     *
+     * + looping through all the single word in the string, then start putting them into cache
+     * -> then check the cache, if the length of cache is larger than the length required, hence, I need to remove
+     * what we have just added, and save it into the merge (which would be used for the result return)
+     *
+     * + in case if the length of cache reaches to the length required, then we are checking whether if the last item is a space
+     * -> if it is a space, get rid of that SPACE within the cache !!! ༼つ◕_◕ ༽つ -> then add it into the the merge
+     * -> if it is not the space, leave it in the cache
+     *
+     * + in case where the cache is under the length, we need to check the differences
+     * between the length required and the length of cache, if the differences is less than or equal 1
+     * (I'm not sure about this solution, but if it need to be 1, other number wouldn't cope this situation well)
+     * get rid of that SPACE within the cache !!! ༼つ◕_◕ ༽つ -> then add the cache into the the merge and clear it
+     *
+     * + other than the new logic updates, the mechanism should be the same as older version
+     *
+     * ---------- END ----------
+     *
+     * - I have found the funny bug, that 0 is actually evaluated as empty,
+     * therefore the older version would return ""
+     * oh dear PHP ٩(͡๏_๏)۶ ٩(͡๏_๏)۶ ٩(͡๏_๏)۶
+     *
+     *
+     * ༼つ◕_◕ ༽つ༼つ◕_◕ ༽つ༼つ◕_◕ ༽つ GOD OF WAR IV ༼つ◕_◕ ༽つ༼つ◕_◕ ༽つ༼つ◕_◕ ༽つ
+     */
+    public function wrapV3(string $input, int $length): string
+    {
+        $inputLength = strlen($input);
+        if ($inputLength == 0)
+        {
+            return "";
+        }
+        else if ($inputLength <= $length)
+        {
+            return $input;
+        }
+
+        $merge = $tmpMerge = array();
+        $threshold = $inputLength - 1;
+        for ($i=0; $i <= $threshold; $i++)
+        {
+            $a = $input[$i];
+
+            /* by this statement, if the next append is the space */
+            if (preg_match("/\s+/", $a) && count($tmpMerge) == 0) continue;
+
+            $tmpMerge[$i] = $a;
+            $t = implode("", $tmpMerge);
+            $ln2 = strlen($t);
+
+            if ($ln2 == $length)
+            {
+                /*
+                    checking whether the last append is a space or not
+                    if it is, then we are getting rid of ༼つ◕_◕ ༽つ SPACE
+                */
+                if (preg_match("/\s+/", $a))
+                {
+                    unset($tmpMerge[$i]);
+                    $merge[] = implode("", $tmpMerge);
+                }
+                else
+                {
+                    $merge[] = $t;
+                }
+                $tmpMerge = array();
+            }
+            else if ($i ==  $threshold)
+            {
+                $merge[] = $t;
+            }
+            else if ($ln2 < $length)
+            {
+                $diff = $length - $ln2;
+                if ($diff <= 1 && preg_match("/\s+/", $a))
+                {
+                    unset($tmpMerge[$i]);
+                    $merge[] = implode("", $tmpMerge);
+                    $tmpMerge = array();
+                }
+            }
+        }
         return implode("\n", $merge);
     }
 }

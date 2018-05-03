@@ -104,4 +104,52 @@ class WrapUtilTest extends TestCase
         $exp ="w\no\nr\nd";
         $this->assertEquals($exp, $this->helper->wrapV2($x, 1));
     }
+
+    public function testWrap3Case1(): void
+    {
+        $ex = "  word word";
+        $x = $ex;
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 14));
+    }
+
+    public function testWrap3Case2(): void
+    {
+        $x = $ex = "word   word";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 14));
+    }
+
+    public function testWrap3Case3(): void
+    {
+        $x = "word word";
+        $ex = "word\nword";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 5));
+    }
+
+    public function testWrap3Case4(): void
+    {
+        $x = "word word";
+        $ex = "word\nword";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 6));
+    }
+
+    public function testWrap3Case5(): void
+    {
+        $x = "God Of War IV is the best, love it !!!";
+        $ex = "God\nOf\nWar\nIV\nis\nthe\nbes\nt,\nlov\ne\nit\n!!!";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 3));
+    }
+
+    public function testWrap3Case6(): void
+    {
+        $x = "God Of War IV is\nthe\tbest, love it !!!";
+        $ex = "God\nOf\nWar\nIV\nis\nthe\nbes\nt,\nlov\ne\nit\n!!!";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 3));
+    }
+
+    public function testWrap3Case7(): void
+    {
+        $x = "Hello \t\nworld";
+        $ex = "Hello\nworld";
+        $this->assertEquals($ex, $this->helper->wrapV3($x, 5));
+    }
 }
